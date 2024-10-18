@@ -14,56 +14,70 @@
     </div>
 
     <div
-      class=" bg-white shadow-xl rounded-xl p-10 text-center w-3/4 mt-5  hover:scale-105 transition-transform duration-500">
+      class=" bg-white shadow-xl rounded-xl p-5 text-center w-3/4 mt-5  hover:scale-105 transition-transform duration-500">
       <h1 class="mb-6 text-4xl font-bold font-serif text-blue-600">Timer</h1>
       <div class="border-t-4 border-b-4 border-blue-600 py-6">
         <span class="time text-8xl font-mono text-blue-600">{{ data.time }}</span>
         <div class="flex justify-center space-x-12 mt-4 text-lg uppercase font-semibold text-gray-700">
-          <span>Minutes</span>
-          <span>Seconds</span>
-          <span>Milliseconds</span>
+          <span class="pl-6">Minutes</span>
+          <span class="pl-6">Seconds</span>
+          <span class="pl-6">Milliseconds</span>
         </div>
       </div>
     </div>
 
     <div
-      class="bg-gray-100 shadow-xl rounded-xl p-10 text-center w-3/2 h-3/2  mt-5 hover:scale-105 transition-transform duration-500 border border-gray-500">
-      <h1 class="mb-5 text-center font-mono font-bold text-3xl text-gray-600">TIME LAPSE</h1>
-      <label class="text-2xl text-center font-mono text-gray-800">Nama Sekolah : </label>
+      class="bg-gray-100 shadow-xl rounded-xl p-5 text-center w-3/2 h-3/2  mt-5 hover:scale-105 transition-transform duration-500 border border-gray-500">
+      <label class="text-2xl text-center font-serif text-gray-800">Nama Sekolah : </label>
       <select name=""
-        class="text-2xl font-bold text-gray-800 mb-10 border border-gray-400 rounded-md p-2 transition duration-300 hover:border-gray-600 focus:border-gray-600 focus:outline-none cursor-pointer">
+        class="text-2xl text-gray-800 mb-10  rounded-md p-2 transition duration-300 hover:border-gray-600 focus:border-gray-600 focus:outline-none cursor-pointer">
         <option value="">Sekolah A</option>
         <option value="">Sekolah B</option>
         <option value="">Sekolah C</option>
       </select>
-      <div>
-        <div class="justify-start text-2xl pb-2 font-mono pl-10 flex">Nama : </div>
-        <div class="justify-start text-2xl pb-2 font-mono pl-10 flex">Nama : </div>
 
-      </div>
-
+      <h1 class="mb-5 text-center font-serif font-bold text-3xl text-gray-600">Time Lapse</h1>
       <div class="border-t-4 border-gray-600 py-6">
-        <span class="time text-8xl font-mono text-gray-600">{{ timelapse.time }}</span>
-        <div class="flex justify-center space-x-12 mt-4 text-lg uppercase font-semibold text-gray-700">
-          <span class="border-b-2 border-gray-600  mr-10 text-center hover:text-gray-600 cursor-pointer">Minutes</span>
-          <span class="border-b-2 border-gray-600  mr-2 text-center hover:text-gray-600 cursor-pointer">Seconds</span>
+        <span class="time text-7xl font-mono text-gray-600">{{ timelapse.time }}</span>
+        <div class="flex justify-center space-x-12  text-lg uppercase font-semibold text-gray-700">
+          <span class="border-b-2 border-gray-600 ml-5 text-center hover:text-gray-600 cursor-pointer">Minutes</span>
+          <span class="border-b-2 border-gray-600   text-center hover:text-gray-600 cursor-pointer">Seconds</span>
           <span
-            class="border-b-2 border-gray-600  mr-5 text-center hover:text-gray-600 cursor-pointer">Milliseconds</span>
+            class="flex border-b-2 border-gray-600 ml-5 text-center hover:text-gray-600 cursor-pointer">Millisec.</span>
         </div>
       </div>
     </div>
 
     <div class="flex justify-center mt-12 space-x-4 mb-10">
-      <button @click="resetTimelapse"
+      <button @click="startPreparation"
         class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transform hover:scale-110 transition-transform duration-300">
-        Reset Time Lapse
+        Waktu Persiapan
       </button>
-      <button @click="reset"
+
+      <button @click="start"
+        class="bg-red-500 hover:bg-gray-600 text-white font-bold py-3 px-12 rounded-lg shadow-lg transform hover:scale-110 transition-transform duration-300">
+        Start
+      </button>
+      <button @click="resetTimelapse"
         class="bg-red-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transform hover:scale-110 transition-transform duration-300">
-        Reset Counter
+        Retry Finish
+      </button>
+      <button @click="detectFinish"
+        class="bg-red-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transform hover:scale-110 transition-transform duration-300">
+        Deteksi Finish
+      </button>
+      <div class="status-indicator flex justify-center mt-4 ">
+        <label class="pr-2 pt-1 font-serif font-bold">Detect Finish</label>
+        <div v-if="Detectfinish" class="w-8 h-8 bg-green-500 rounded-full"></div>
+        <div v-else class="w-8 h-8 bg-red-500 rounded-full"></div>
+      </div>
+    </div>
+    <div class="pb-5">
+      <button @click="showResetModal = true"
+        class="bg-red-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transform hover:scale-110 transition-transform duration-300">
+        Reset
       </button>
     </div>
-
     <div class="flex justify-start mr-5">
       <div class="flex justify-start mr-20">
         <label class="text-left font-mono font-bold text-2xl mr-20">Status : {{ status }}</label>
@@ -77,18 +91,31 @@
       <button @click="connect"
         class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transform hover:scale-110 transition-transform duration-300">Connect</button>
     </div>
-
+    <div>
+      <div v-if="showResetModal" class="fixed z-10 inset-0 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen">
+          <div class="bg-white rounded-lg shadow-xl p-6">
+            <h2 class="text-lg font-semibold mb-4">Apakah Anda yakin ingin mereset?</h2>
+            <div class="flex justify-end space-x-4">
+              <button @click="showResetModal = false" class="bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                No
+              </button>
+              <button @click="confirmReset" class="bg-red-500 text-white font-bold py-2 px-4 rounded">
+                Yes
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
-
-
 <script>
 export default {
-  components: {
-  },
-  name: "stopwatchPage",
+  name: "StopwatchPage",
   data() {
     return {
+      showResetModal: false, // Kontrol visibilitas modal
       timeBegan: null,
       timeStopped: null,
       stoppedDuration: 0,
@@ -100,99 +127,200 @@ export default {
         time: '00:00:00'
       },
       data: {
-        time: '00:00:00'
+        time: '00:00:00' // Tambahkan format untuk millisecond
       },
-      ws: null // Menambahkan properti untuk WebSocket
+      preparationTime: '01:00:00', // Properti untuk waktu persiapan termasuk millisecond
+      preparationInterval: null, // Interval untuk hitungan mundur
+      totalPreparationTime: 60000, // Waktu persiapan total dalam millisecond (1 menit)
+      ws: null, // Menambahkan properti untuk WebSocket
+      Triggered: false,
+      timeoutID: null,
+      Detectfinish: false,
+      startCount: false,
+      finishRobot: false,
+      startPersiapan: false
     };
   },
   methods: {
+    confirmReset() {
+      this.showResetModal = false;
+      this.resetButton();
+    },
     connect() {
       console.log(this.Ipaddres)
       this.setupWebSocket();
     },
-    start() {
-      if (this.running) return;
+    detectFinish() {
+      if (this.running || this.Triggered) {
+        this.Detectfinish = true;
+      }
+    },
+    startTimer() {
       if (this.timeBegan === null) {
         this.reset();
         this.timeBegan = new Date();
       }
-
       if (this.timeStopped !== null) {
         this.stoppedDuration += (new Date() - this.timeStopped);
       }
       this.started = setInterval(this.clockRunning, 10);
       this.running = true;
     },
+    start() {
+      if (!this.startPersiapan) {
+        this.startCount = true;
+        if (this.running) return;
+        this.timeoutID = setTimeout(() => {
+          if (!this.Triggered) {
+            this.startTimer();
+          }
+        }, 2000);
+      }
+    },
     stop() {
       this.running = false;
       this.timeStopped = new Date();
       clearInterval(this.started);
     },
-    async reset() {
+    reset() {
+      this.startPersiapan = false;
       this.running = false;
       clearInterval(this.started);
       this.stoppedDuration = 0;
       this.timeBegan = null;
       this.timeStopped = null;
       this.data.time = "00:00:00";
-      // this.timelapse.time = "00:00:00";
-      //this.sendReset();
+    },
+    resetButton() {
+
+      this.startPersiapan = false;
+      this.running = false;
+      clearInterval(this.started);
+      clearInterval(this.preparationInterval);
+      this.stoppedDuration = 0;
+      this.timeBegan = null;
+      this.timeStopped = null;
+      this.data.time = "00:00:00";
+      this.timelapse.time = "00:00:00";
+      this.Triggered = false;
+      this.timeoutID = null;
+      this.Detectfinish = false;
+      this.startCount = false;
+      this.finishRobot = false;
+      this.startPersiapan = false;
+
     },
     resetTimelapse() {
       this.timelapse.time = "00:00:00";
-      this.sendReset();
+      this.finishRobot = false;
+      this.Detectfinish = false;
     },
     finish() {
-      this.timelapse.time = this.data.time;
+      if (!this.finishRobot) {
+        this.timelapse.time = this.data.time;
+        this.finishRobot = true;
+      }
     },
     clockRunning() {
       const currentTime = new Date();
       const timeElapsed = new Date(currentTime - this.timeBegan - this.stoppedDuration);
-      // const hour = timeElapsed.getUTCHours();
       const min = timeElapsed.getUTCMinutes();
       const sec = timeElapsed.getUTCSeconds();
       const ms = timeElapsed.getUTCMilliseconds();
 
       this.data.time =
-        // this.zeroPrefix(hour, 2) + ":" +
         this.zeroPrefix(min, 2) + ":" +
         this.zeroPrefix(sec, 2) + ":" +
-        this.zeroPrefix(ms, 2);
+        this.zeroPrefix(ms, 3);
     },
     zeroPrefix(num, digit) {
-      return String(num).padStart(digit, '0'); // Menggunakan padStart untuk menambah nol di depan
-    },
-    sendReset() {
-      if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-        this.ws.send('Reset');
-      }
+      return String(num).padStart(digit, '0');
     },
     setupWebSocket() {
+      if (this.ws) {
+        console.log("Resetting existing WebSocket connection...");
+        this.ws.close(); 
+      }
       this.ws = new WebSocket(`ws://${this.Ipaddres}:81`);
+      this.ws.onopen = () => {
+        console.log("WebSocket connection established");
+        this.status = 'Connected';
+      };
       this.ws.onmessage = (event) => {
         const message = event.data;
-        // console.log(message);
-        if (message === "Start") {
-          this.start();
-        } else if (message === "Finish") {
+        console.log(message);
+        if (message === "Trigger" && !this.running && this.startCount) {
+          console.log('Start');
+          this.Triggered = true;
+          clearTimeout(this.timeoutID);
+          this.startTimer();
+        } else if (message === "Trigger" && this.running && this.Detectfinish) {
+          console.log("Finish");
           this.finish();
         }
       };
 
-      this.ws.onopen = () => {
-        console.log("WebSocket connection established");
-        this.status = 'Connected'
-      };
-
       this.ws.onclose = () => {
         console.log("WebSocket connection closed");
-        this.status = 'Not Connect'
-        setTimeout(this.setupWebSocket, 1000);
+        this.status = 'Not Connect';
+        setTimeout(() => this.setupWebSocket(), 1000);
       };
 
       this.ws.onerror = (error) => {
         console.error("WebSocket error: ", error);
       };
+    },
+    // setupWebSocket() {
+    //   this.ws = new WebSocket(`ws://${this.Ipaddres}:81`);
+      
+    //   this.ws.onmessage = (event) => {
+    //     const message = event.data;
+    //     console.log(message);
+    //     if (message === "Trigger" && !this.running && this.startCount) {
+    //       console.log('Start');
+    //       this.Triggered = true;
+    //       clearTimeout(this.timeoutID);
+    //       this.startTimer();
+    //     } else if (message === "Trigger" && this.running && this.Detectfinish) {
+    //       console.log("Finish");
+    //       this.finish();
+    //     }
+    //   };
+
+    //   this.ws.onopen = () => {
+    //     console.log("WebSocket connection established");
+    //     this.status = 'Connected'
+    //   };
+
+    //   this.ws.onclose = () => {
+    //     console.log("WebSocket connection closed");
+    //     this.status = 'Not Connect'
+    //     setTimeout(this.setupWebSocket, 1000);
+    //   };
+
+    //   this.ws.onerror = (error) => {
+    //     console.error("WebSocket error: ", error);
+    //   };
+    // },
+    startPreparation() {
+      if (this.Triggered || this.running) { return; }
+      this.startPersiapan = true;
+      let totalTime = this.totalPreparationTime;
+      this.preparationInterval = setInterval(() => {
+        totalTime -= 10;
+        const minutes = Math.floor(totalTime / 60000);
+        const seconds = Math.floor((totalTime % 60000) / 1000);
+        const milliseconds = totalTime % 1000;
+        this.preparationTime = `${this.zeroPrefix(minutes, 2)}:${this.zeroPrefix(seconds, 2)}:${this.zeroPrefix(milliseconds, 2)}`;
+        this.data.time = this.preparationTime;
+        if (totalTime <= 0) {
+          clearInterval(this.preparationInterval);
+          this.preparationTime = '00:00:00';
+          this.data.time = '00:00:00';
+          alert('Waktu persiapan selesai!');
+          this.startPersiapan = false;
+        }
+      }, 10);
     }
   },
   mounted() {
@@ -200,6 +328,7 @@ export default {
   }
 };
 </script>
+
 
 
 <style scoped>
