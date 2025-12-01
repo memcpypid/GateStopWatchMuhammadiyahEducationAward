@@ -1,5 +1,6 @@
 import { createWebHistory, createRouter } from "vue-router";
 import Stopwatch from "@/views/Stopwatch.vue";
+import Juri from "@/views/Juri.vue";
 
 
 const routes = [
@@ -7,6 +8,11 @@ const routes = [
     path: "/",
     name: "Home",
     component: Stopwatch,
+  },
+  {
+    path: "/juri",
+    name: "Juri",
+    component: Juri,
   },
 ];
 

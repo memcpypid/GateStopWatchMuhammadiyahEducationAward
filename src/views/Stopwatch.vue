@@ -1,404 +1,272 @@
 <template>
-  <div
-    class="min-h-screen bg-gradient-to-r from-blue-500 via-white to-blue-500 flex flex-col justify-center items-center">
-    <div class="fixed top-0 left-0 w-full flex justify-between items-center p-4 bg-white shadow-lg">
-      <div class="flex items-center space-x-4">
-        <img src="../assets/umm.png" alt="umm-logo" class="h-20 w-auto">
-      </div>
-      <h1 class="text-4xl font-bold text-gray-900 text-center">Muhammadiyah Education Award</h1>
-      <img src="../assets/mealogo.png" alt="mealogo" class="h-20 w-auto">
-    </div>
+  <div class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex flex-col overflow-x-hidden">
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 bg-white border-b-2 border-red-600 shadow-lg z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div class="flex items-center justify-between gap-4 lg:gap-8">
+          <!-- Left Logo -->
+          <div class="flex items-center gap-4 flex-shrink-0">
+            <img src="../assets/umm.png" alt="umm-logo" class="h-14 sm:h-16 w-auto object-contain">
+            <div class="hidden sm:block w-1 h-12 bg-gradient-to-b from-red-600 to-red-400"></div>
+          </div>
 
-    <div class="mt-10">
-      <h2 class="text-3xl font-semibold text-gray-800 mt-24">Line Follower Competition</h2>
-    </div>
+          <!-- Center Title -->
+          <div class="flex-1 text-center min-w-0">
+            <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-red-600 truncate">
+              Universitas Muhammadiyah Malang
+            </h1>
+            <p class="text-xs sm:text-sm text-gray-500 font-medium mt-1">
+              Kontes Kapal Indonesia 2025
+            </p>
+          </div>
 
-    <div
-      class=" bg-white shadow-xl rounded-xl p-5 text-center w-3/4 mt-5  hover:scale-105 transition-transform duration-500">
-      <h1 class="mb-6 text-4xl font-bold font-serif text-blue-600">Timer</h1>
-      <div class="border-t-4 border-b-4 border-blue-600 py-6">
-        <span class="time text-8xl font-mono text-blue-600">{{ data.time }}</span>
-        <div class="flex justify-center space-x-12 mt-4 text-lg uppercase font-semibold text-gray-700">
-          <span class="pl-6">Minutes</span>
-          <span class="pl-6">Seconds</span>
-          <span class="pl-6">Milliseconds</span>
+          <!-- Right Logo -->
+          <div class="flex items-center gap-4 flex-shrink-0">
+            <div class="hidden sm:block w-1 h-12 bg-gradient-to-b from-red-600 to-red-400"></div>
+            <img src="../assets/maskot.png" alt="maskotlogo" class="h-20 sm:h-50 w-auto object-contain bg-white">
+          </div>
         </div>
       </div>
-    </div>
+    </header>
 
-    <div
-      class="bg-gray-100 shadow-xl rounded-xl p-5 text-center w-3/2 h-3/2  mt-5 hover:scale-105 transition-transform duration-500 border border-gray-500">
-      <label class="text-2xl text-center font-serif text-gray-800">Nama Sekolah : </label>
-      <select name=""
-        class="text-2xl text-gray-800 mb-10  rounded-md p-2 transition duration-300 hover:border-gray-600 focus:border-gray-600 focus:outline-none cursor-pointer">
-        <option value="">Sekolah A</option>
-        <option value="">Sekolah B</option>
-        <option value="">Sekolah C</option>
-      </select>
-
-      <h1 class="mb-5 text-center font-serif font-bold text-3xl text-gray-600">Time Lapse</h1>
-      <div class="border-t-4 border-gray-600 py-6">
-        <span class="time text-7xl font-mono text-gray-600">{{ timelapse.time }}</span>
-        <div class="flex justify-center space-x-12  text-lg uppercase font-semibold text-gray-700">
-          <span class="border-b-2 border-gray-600 ml-5 text-center hover:text-gray-600 cursor-pointer">Minutes</span>
-          <span class="border-b-2 border-gray-600   text-center hover:text-gray-600 cursor-pointer">Seconds</span>
-          <span
-            class="flex border-b-2 border-gray-600 ml-5 text-center hover:text-gray-600 cursor-pointer">Millisec.</span>
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 pt-28 sm:pt-32 pb-12">
+      <!-- Title Section -->
+      <div class="mb-8 sm:mb-12 text-center w-full max-w-4xl">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 leading-tight">
+          Kontes Kapal Indonesia
+        </h2>
+        <div
+          class="h-1.5 w-20 sm:w-24 bg-gradient-to-r from-red-600 via-red-500 to-red-400 mx-auto rounded-full shadow-md">
         </div>
       </div>
-    </div>
 
-    <div class="flex justify-center mt-12 space-x-4 mb-10">
-      <button @click="startPreparation"
-        class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transform hover:scale-110 transition-transform duration-300">
-        Waktu Persiapan
-      </button>
+      <!-- Timer Card Container -->
+      <div class="w-full max-w-4xl">
+        <div
+          class="bg-white rounded-3xl shadow-2xl border-t-4 border-red-600 overflow-hidden hover:shadow-3xl transition-shadow duration-300">
+          <!-- Card Header -->
+          <div class="bg-gradient-to-r from-red-50 to-pink-50 px-6 sm:px-8 py-6 border-b border-red-200">
+            <h3 class="text-2xl sm:text-3xl font-bold text-red-700 text-center">⏱️ Timer Kompetisi</h3>
+          </div>
 
-      <button @click="start"
-        class="bg-red-500 hover:bg-gray-600 text-white font-bold py-3 px-12 rounded-lg shadow-lg transform hover:scale-110 transition-transform duration-300">
-        Start
-      </button>
-      <button @click="resetTimelapse"
-        class="bg-red-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transform hover:scale-110 transition-transform duration-300">
-        Retry Finish
-      </button>
-      <button @click="detectFinish"
-        class="bg-red-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transform hover:scale-110 transition-transform duration-300">
-        Deteksi Finish
-      </button>
-      <div class="status-indicator flex justify-center mt-4 ">
-        <label class="pr-2 pt-1 font-serif font-bold">Detect Finish</label>
-        <div v-if="Detectfinish" class="w-8 h-8 bg-green-500 rounded-full"></div>
-        <div v-else class="w-8 h-8 bg-red-500 rounded-full"></div>
-      </div>
-    </div>
-    <div class="pb-5">
-      <button @click="showResetModal = true"
-        class="bg-red-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transform hover:scale-110 transition-transform duration-300">
-        Reset
-      </button>
-    </div>
-    <div class="flex justify-start mr-5">
-      <div class="flex justify-start mr-20">
-        <label class="text-left font-mono font-bold text-2xl mr-20">Status : {{ status }}</label>
-      </div>
-    </div>
+          <!-- Timer Display Section -->
+          <div class="px-6 sm:px-12 py-8 sm:py-12">
+            <!-- Main Timer -->
+            <div
+              class="bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl border-2 border-slate-200 p-6 sm:p-10 mb-8 hover:border-red-300 transition-colors duration-300">
+              <div class="text-center">
+                <div
+                  class="font-mono font-black text-7xl sm:text-8xl lg:text-9xl text-red-600 tracking-wider leading-none mb-4 select-none">
+                  {{ data.time }}
+                </div>
+                <div
+                  class="flex justify-center gap-6 sm:gap-12 mt-6 text-xs sm:text-sm font-bold text-slate-600 uppercase tracking-widest">
+                  <span class="px-3 py-1 bg-slate-200 rounded-full">MM</span>
+                  <span class="px-3 py-1 bg-slate-200 rounded-full">SS</span>
+                  <span class="px-3 py-1 bg-slate-200 rounded-full">ms</span>
+                </div>
+              </div>
+            </div>
 
-    <div class="flex justify-center mt-2 space-x-4 mb-5">
-      <label class="flex justify-center text-2xl">IP Address : </label>
-      <input v-model="Ipaddres" type="text"
-        class="bg-gray-200 border-b-3 pb-2 place-content-center placeholder-gray-700">
-      <button @click="connect"
-        class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transform hover:scale-110 transition-transform duration-300">Connect</button>
-    </div>
-    <div>
-      <div v-if="showResetModal" class="fixed z-10 inset-0 overflow-y-auto">
-        <div class="flex items-center justify-center min-h-screen">
-          <div class="bg-white rounded-lg shadow-xl p-6">
-            <h2 class="text-lg font-semibold mb-4">Apakah Anda yakin ingin mereset?</h2>
-            <div class="flex justify-end space-x-4">
-              <button @click="showResetModal = false" class="bg-gray-500 text-white font-bold py-2 px-4 rounded">
-                No
+            <!-- Status Indicator -->
+            <div class="flex justify-center mb-8">
+              <div
+                class="px-6 py-3 bg-gradient-to-r from-red-50 to-pink-50 border-2 border-red-200 rounded-full hover:border-red-400 transition-colors duration-200">
+                <p class="text-sm font-semibold text-red-700">
+                  Status: <span class="font-black text-red-600">Ready</span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Control Buttons Section -->
+          <div class="px-6 sm:px-8 py-8 bg-gradient-to-b from-white to-slate-50 border-t border-slate-200">
+            <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+              <!-- Start Button -->
+              <button @click="start"
+                class="px-8 sm:px-12 py-3 sm:py-4 bg-gradient-to-br from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 active:from-green-600 active:to-green-800 text-white font-bold text-base sm:text-lg rounded-xl shadow-lg hover:shadow-2xl active:shadow-md transform hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap">
+                <span class="text-xl"></span> Start
               </button>
-              <button @click="confirmReset" class="bg-red-500 text-white font-bold py-2 px-4 rounded">
-                Yes
+
+              <!-- Finish Button -->
+              <button @click="finish"
+                class="px-8 sm:px-12 py-3 sm:py-4 bg-gradient-to-br from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 active:from-amber-600 active:to-amber-800 text-white font-bold text-base sm:text-lg rounded-xl shadow-lg hover:shadow-2xl active:shadow-md transform hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap">
+                <span class="text-xl"></span> Finish
+              </button>
+
+              <!-- Reset Button -->
+              <button @click="showResetModal = true"
+                class="px-8 sm:px-12 py-3 sm:py-4 bg-gradient-to-br from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 active:from-red-700 active:to-red-900 text-white font-bold text-base sm:text-lg rounded-xl shadow-lg hover:shadow-2xl active:shadow-md transform hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap">
+                <span class="text-xl"></span> Reset
               </button>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </main>
+
+    <!-- Reset Confirmation Modal -->
+    <transition enter-active-class="transition ease-out duration-200" enter-from-class="opacity-0 scale-95"
+      enter-to-class="opacity-100 scale-100" leave-active-class="transition ease-in duration-200"
+      leave-from-class="opacity-100 scale-100" leave-to-class="opacity-0 scale-95">
+      <div v-if="showResetModal"
+        class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 max-w-sm w-full border-t-4 border-red-600">
+          <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">🔄 Konfirmasi Reset</h2>
+          <p class="text-gray-600 mb-8 text-sm sm:text-base leading-relaxed">
+            Apakah Anda yakin ingin mereset timer? Tindakan ini tidak dapat dibatalkan.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-3 justify-end">
+            <button @click="showResetModal = false"
+              class="px-6 py-2 sm:py-3 bg-gradient-to-br from-gray-300 to-gray-400 hover:from-gray-400 hover:to-gray-500 text-gray-800 font-bold rounded-lg transition-all duration-200 hover:shadow-md active:scale-95">
+              Batal
+            </button>
+            <button @click="confirmReset"
+              class="px-6 py-2 sm:py-3 bg-gradient-to-br from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 text-white font-bold rounded-lg transition-all duration-200 hover:shadow-md active:scale-95">
+              Reset Sekarang
+            </button>
+          </div>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
+
 <script>
+const WS_URL = process.env.VUE_APP_WS_URL || 'ws://192.168.1.175:3000';
+
 export default {
   name: "StopwatchPage",
   data() {
     return {
-      showResetModal: false, // Kontrol visibilitas modal
-      timeBegan: null,
-      timeStopped: null,
-      stoppedDuration: 0,
-      started: null,
-      running: false,
-      Ipaddres: '',
-      status: 'Not Connect',
-      timelapse: {
+      showResetModal: false,
+      data: {
         time: '00:00:00'
       },
-      data: {
-        time: '00:00:00' // Tambahkan format untuk millisecond
-      },
-      preparationTime: '01:00:00', // Properti untuk waktu persiapan termasuk millisecond
-      preparationInterval: null, // Interval untuk hitungan mundur
-      totalPreparationTime: 60000, // Waktu persiapan total dalam millisecond (1 menit)
-      ws: null, // Menambahkan properti untuk WebSocket
-      Triggered: false,
-      timeoutID: null,
-      Detectfinish: false,
-      startCount: false,
-      finishRobot: false,
-      startPersiapan: false
+      ws: null,
+      wsConnected: false,
+      keyHandler: null,
     };
   },
+
   methods: {
     confirmReset() {
       this.showResetModal = false;
-      this.resetButton();
+      this.sendTrigger("reset");
     },
-    connect() {
-      console.log(this.Ipaddres)
-      this.setupWebSocket();
-    },
-    detectFinish() {
-      if (this.running || this.Triggered) {
-        this.Detectfinish = true;
-      }
-    },
-    startTimer() {
-      if (this.timeBegan === null) {
-        this.reset();
-        this.timeBegan = new Date();
-      }
-      if (this.timeStopped !== null) {
-        this.stoppedDuration += (new Date() - this.timeStopped);
-      }
-      this.started = setInterval(this.clockRunning, 10);
-      this.running = true;
-    },
+
     start() {
-      if (!this.startPersiapan) {
-        this.startCount = true;
-        if (this.running) return;
-        this.timeoutID = setTimeout(() => {
-          if (!this.Triggered) {
-            this.startTimer();
-          }
-        }, 2000);
-      }
+      this.sendTrigger("start");
     },
-    stop() {
-      this.running = false;
-      this.timeStopped = new Date();
-      clearInterval(this.started);
-    },
-    reset() {
-      this.startPersiapan = false;
-      this.running = false;
-      clearInterval(this.started);
-      this.stoppedDuration = 0;
-      this.timeBegan = null;
-      this.timeStopped = null;
-      this.data.time = "00:00:00";
-    },
-    resetButton() {
 
-      this.startPersiapan = false;
-      this.running = false;
-      clearInterval(this.started);
-      clearInterval(this.preparationInterval);
-      this.stoppedDuration = 0;
-      this.timeBegan = null;
-      this.timeStopped = null;
-      this.data.time = "00:00:00";
-      this.timelapse.time = "00:00:00";
-      this.Triggered = false;
-      this.timeoutID = null;
-      this.Detectfinish = false;
-      this.startCount = false;
-      this.finishRobot = false;
-      this.startPersiapan = false;
-
-    },
-    resetTimelapse() {
-      this.timelapse.time = "00:00:00";
-      this.finishRobot = false;
-      this.Detectfinish = false;
-    },
     finish() {
-      if (!this.finishRobot) {
-        this.timelapse.time = this.data.time;
-        this.finishRobot = true;
-      }
+      this.sendTrigger("finish");
     },
-    clockRunning() {
-      const currentTime = new Date();
-      const timeElapsed = new Date(currentTime - this.timeBegan - this.stoppedDuration);
-      const min = timeElapsed.getUTCMinutes();
-      const sec = timeElapsed.getUTCSeconds();
-      const ms = timeElapsed.getUTCMilliseconds();
 
-      this.data.time =
-        this.zeroPrefix(min, 2) + ":" +
-        this.zeroPrefix(sec, 2) + ":" +
-        this.zeroPrefix(ms, 3);
+    sendTrigger(triggerType) {
+      if (!this.wsConnected) {
+        console.warn("❌ WebSocket not connected!");
+        return;
+      }
+      const message = JSON.stringify({ trigger: triggerType });
+      this.ws.send(message);
+      console.log("📡 Trigger sent:", triggerType);
     },
+
     zeroPrefix(num, digit) {
       return String(num).padStart(digit, '0');
     },
-    setupWebSocket() {
-      if (this.ws) {
-        console.log("Resetting existing WebSocket connection...");
-        this.ws.close(); 
-      }
-      this.ws = new WebSocket(`ws://${this.Ipaddres}:81`);
-      this.ws.onopen = () => {
-        console.log("WebSocket connection established");
-        this.status = 'Connected';
-      };
-      this.ws.onmessage = (event) => {
-        const message = event.data;
-        console.log(message);
-        if (message === "Trigger" && !this.running && this.startCount) {
-          console.log('Start');
-          this.Triggered = true;
-          clearTimeout(this.timeoutID);
-          this.startTimer();
-        } else if (message === "Trigger" && this.running && this.Detectfinish) {
-          console.log("Finish");
-          this.finish();
-        }
-      };
 
-      this.ws.onclose = () => {
-        console.log("WebSocket connection closed");
-        this.status = 'Not Connect';
-        setTimeout(() => this.setupWebSocket(), 1000);
-      };
+    formatTime(elapsedMs) {
+      const minutes = Math.floor(elapsedMs / 60000);
+      const seconds = Math.floor((elapsedMs % 60000) / 1000);
+      const milliseconds = elapsedMs % 1000;
 
-      this.ws.onerror = (error) => {
-        console.error("WebSocket error: ", error);
-      };
+      return (
+        this.zeroPrefix(minutes, 2) + ":" +
+        this.zeroPrefix(seconds, 2) + ":" +
+        this.zeroPrefix(milliseconds, 3)
+      );
     },
-    // setupWebSocket() {
-    //   this.ws = new WebSocket(`ws://${this.Ipaddres}:81`);
-      
-    //   this.ws.onmessage = (event) => {
-    //     const message = event.data;
-    //     console.log(message);
-    //     if (message === "Trigger" && !this.running && this.startCount) {
-    //       console.log('Start');
-    //       this.Triggered = true;
-    //       clearTimeout(this.timeoutID);
-    //       this.startTimer();
-    //     } else if (message === "Trigger" && this.running && this.Detectfinish) {
-    //       console.log("Finish");
-    //       this.finish();
-    //     }
-    //   };
 
-    //   this.ws.onopen = () => {
-    //     console.log("WebSocket connection established");
-    //     this.status = 'Connected'
-    //   };
+    handleKeyPress(event) {
+      const key = event.key.toUpperCase();
 
-    //   this.ws.onclose = () => {
-    //     console.log("WebSocket connection closed");
-    //     this.status = 'Not Connect'
-    //     setTimeout(this.setupWebSocket, 1000);
-    //   };
+      switch (key) {
+        case 'S':
+          console.log("⌨️  Keyboard: S pressed → Starting timer");
+          this.start();
+          break;
+        case 'F':
+          console.log("⌨️  Keyboard: F pressed → Finishing timer");
+          this.finish();
+          break;
+        case 'R':
+          console.log("⌨️  Keyboard: R pressed → Resetting timer");
+          this.showResetModal = true;
+          break;
+      }
+    },
 
-    //   this.ws.onerror = (error) => {
-    //     console.error("WebSocket error: ", error);
-    //   };
-    // },
-    startPreparation() {
-      if (this.Triggered || this.running) { return; }
-      this.startPersiapan = true;
-      let totalTime = this.totalPreparationTime;
-      this.preparationInterval = setInterval(() => {
-        totalTime -= 10;
-        const minutes = Math.floor(totalTime / 60000);
-        const seconds = Math.floor((totalTime % 60000) / 1000);
-        const milliseconds = totalTime % 1000;
-        this.preparationTime = `${this.zeroPrefix(minutes, 2)}:${this.zeroPrefix(seconds, 2)}:${this.zeroPrefix(milliseconds, 2)}`;
-        this.data.time = this.preparationTime;
-        if (totalTime <= 0) {
-          clearInterval(this.preparationInterval);
-          this.preparationTime = '00:00:00';
-          this.data.time = '00:00:00';
-          alert('Waktu persiapan selesai!');
-          this.startPersiapan = false;
-        }
-      }, 10);
+    setupWebSocket() {
+      try {
+        this.ws = new WebSocket(`${WS_URL}/ws`);
+
+        this.ws.onopen = () => {
+          this.wsConnected = true;
+          console.log("🟢 WebSocket Connected");
+        };
+
+        this.ws.onmessage = (event) => {
+          try {
+            const timerState = JSON.parse(event.data);
+            console.log("📨 Received from backend:", timerState);
+            this.data.time = this.formatTime(timerState.elapsed_ms);
+          } catch (error) {
+            console.error("❌ Error parsing WebSocket message:", error);
+            console.error("Raw data:", event.data);
+          }
+        };
+
+        this.ws.onerror = (error) => {
+          console.error("❌ WebSocket error:", error);
+        };
+
+        this.ws.onclose = () => {
+          this.wsConnected = false;
+          console.warn("🔴 WebSocket disconnected. Reconnecting in 2s...");
+          setTimeout(this.setupWebSocket, 2000);
+        };
+      } catch (error) {
+        console.error("❌ Failed to setup WebSocket:", error);
+      }
+    },
+  },
+
+  mounted() {
+    console.log("🚀 Timer Frontend Loaded");
+    console.log("📡 WebSocket URL:", WS_URL);
+    console.log("⌨️  Keyboard Shortcuts: S=Start, F=Finish, R=Reset");
+    this.setupWebSocket();
+
+    // Create bound keyboard handler
+    this.keyHandler = (event) => this.handleKeyPress(event);
+    window.addEventListener('keydown', this.keyHandler);
+  },
+
+  beforeUnmount() {
+    if (this.ws) {
+      this.ws.close();
+    }
+    if (this.keyHandler) {
+      window.removeEventListener('keydown', this.keyHandler);
     }
   },
-  mounted() {
-    // this.setupWebSocket();
-  }
 };
 </script>
 
 
-
 <style scoped>
-body,
-html {
-  margin: 0;
-  padding: 0;
-}
-
-.bg-gradient-to-r {
-  background: linear-gradient(90deg, rgba(29, 78, 216, 1) 0%, rgba(255, 255, 255, 1) 50%, rgba(29, 78, 216, 1) 100%);
-}
+/* Pure Tailwind CSS - No custom styles needed */
 </style>
-
-<!-- 
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
-
-html,
-body {
-  padding: 0;
-  margin: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-body {
-  background-color: #FFFF;
-  font-family: 'Share Tech Mono', sans-serif;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-}
-
-#clock {
-  color: #000000;
-}
-
-.time {
-  font-size: 6.5em;
-}
-
-.btn-container {
-  display: flex;
-  margin-top: 15px;
-}
-
-.btn-container a {
-  text-align: center;
-  background: transparent;
-  border: 3px solid rgb(200, 200, 200);
-  color: rgb(200, 200, 200);
-  padding: 10px 15px;
-  margin: 0 10px;
-  text-transform: uppercase;
-  font-size: 2em;
-  cursor: pointer;
-  text-shadow: 0px 0px 10px rgb(200, 200, 200);
-  flex-grow: 1;
-  transition: color 0.1s ease-out;
-}
-
-.btn-container a:hover {
-  color: white;
-}
-</style> -->
