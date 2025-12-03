@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -12,18 +13,27 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	_ "github.com/mattn/go-sqlite3"
 )
 
-// TimerState menyimpan status timer. Akses harus dikunci dengan stateMu.
 type TimerState struct {
-	Running    bool   `json:"running"`
-	ElapsedMs  int64  `json:"elapsed_ms"`
-	Status     string `json:"status"`
-	StartTime  int64  `json:"start_time_unix_ms"`
-	FinishTime int64  `json:"finish_time_unix_ms"`
+	Running            bool   `json:"running"`
+	ElapsedMs          int64  `json:"elapsed_ms"`
+	Status             string `json:"status"`
+	StartTime          int64  `json:"start_time_unix_ms"`
+	FinishTime         int64  `json:"finish_time_unix_ms"`
+	StartTimeStopWatch int64  `json:"start_time_stopwatch_unix_ms"`
+	StopwatchRunning   bool   `json:"stopwatch_running"`
+	StopwatchElapsed   int64  `json:"stopwatch_elapsed_ms"`
+	StopwatchMaxMs     int64  `json:"stopwatch_max_ms"`
 }
 
-// Client mewakili koneksi websocket per-klien dengan pump terpisah
+type HistoryEntry struct {
+	ID        int64 `json:"id"`
+	ElapsedMs int64 `json:"elapsed_ms"`
+	Timestamp int64 `json:"timestamp"`
+}
+
 type Client struct {
 	conn      *websocket.Conn
 	send      chan []byte
@@ -32,99 +42,170 @@ type Client struct {
 }
 
 var (
-	state     = &TimerState{Status: "Idle"}
-	stateMu   = sync.Mutex{}           // protects access to state
-	wsClients = make(map[*Client]bool) // active clients
-	wsMutex   = sync.Mutex{}           // protects wsClients
-	upgrader  = websocket.Upgrader{CheckOrigin: func(r *http.Request) bool { return true }}
+	state = &TimerState{
+		Status:         "Idle",
+		StopwatchMaxMs: 1 * 60 * 1000,
+	}
+	stateMu sync.RWMutex
+
+	wsClients = make(map[*Client]bool)
+	wsMutex   sync.Mutex
+
+	upgrader = websocket.Upgrader{CheckOrigin: func(r *http.Request) bool {
+		return true
+	}}
+
+	db      *sql.DB
+	dbMutex sync.Mutex
 )
 
-// WebSocket control constants
 const (
 	writeWait      = 10 * time.Second
 	pongWait       = 60 * time.Second
-	pingPeriod     = (pongWait * 9) / 10
-	maxMessageSize = 512
+	pingPeriod     = pongWait * 9 / 10
+	maxMessageSize = 1024
 )
 
+func initDB() error {
+	var err error
+	db, err = sql.Open("sqlite3", "./timer.db")
+	if err != nil {
+		return err
+	}
+
+	// WAL mode sangat penting untuk Raspberry Pi
+	_, _ = db.Exec(`PRAGMA journal_mode=WAL;`)
+	_, _ = db.Exec(`PRAGMA synchronous=NORMAL;`)
+
+	createTableSQL := `
+	CREATE TABLE IF NOT EXISTS history (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		elapsed_ms INTEGER NOT NULL,
+		timestamp INTEGER NOT NULL
+	);
+	`
+
+	_, err = db.Exec(createTableSQL)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func saveToHistory(elapsedMs int64) error {
+	dbMutex.Lock()
+	defer dbMutex.Unlock()
+
+	_, err := db.Exec(`INSERT INTO history(elapsed_ms, timestamp) VALUES (?, ?)`, elapsedMs, time.Now().UnixMilli())
+	return err
+}
+
+func getHistory() ([]HistoryEntry, error) {
+	dbMutex.Lock()
+	defer dbMutex.Unlock()
+
+	rows, err := db.Query(`SELECT id, elapsed_ms, timestamp FROM history ORDER BY id ASC`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	list := make([]HistoryEntry, 0, 100)
+	for rows.Next() {
+		var e HistoryEntry
+		if err := rows.Scan(&e.ID, &e.ElapsedMs, &e.Timestamp); err != nil {
+			return nil, err
+		}
+		list = append(list, e)
+	}
+	return list, nil
+}
+
+func clearHistory() error {
+	dbMutex.Lock()
+	defer dbMutex.Unlock()
+
+	_, err := db.Exec(`DELETE FROM history`)
+	return err
+}
+
 func main() {
-	// Use Gin
+	if err := initDB(); err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
 	router := gin.Default()
 
-	// CORS - allow any origin (adjust for production as needed)
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
-		AllowHeaders:     []string{"Content-Type"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-		MaxAge:           12 * time.Hour,
+		AllowOrigins: []string{"*"},
+		AllowMethods: []string{"GET", "POST", "OPTIONS"},
+		AllowHeaders: []string{"Content-Type"},
 	}))
 
-	// Routes
-	router.GET("/health", healthHandler)    // quick health check
-	router.GET("/status", statusHandler)    // HTTP status snapshot
-	router.POST("/trigger", triggerHandler) // trigger via HTTP (plain text or JSON)
-	router.GET("/ws", wsHandler)            // websocket endpoint
+	router.GET("/health", func(c *gin.Context) { c.JSON(200, gin.H{"status": "ok"}) })
+	router.GET("/status", statusHandler)
+	router.POST("/trigger", triggerHandler)
+	router.GET("/ws", wsHandler)
+	router.GET("/history", historyHandler)
+	router.POST("/history/clear", clearHistoryHandler)
 
-	// Start ticker (updates + broadcast)
 	go timerTicker()
 
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "3000"
 	}
+	log.Println("Running on port:", port)
 
-	log.Println("🚀 Backend Timer running on port", port)
-	if err := router.Run(":" + port); err != nil {
-		log.Fatalf("Server failed: %v", err)
-	}
-}
-
-func healthHandler(c *gin.Context) {
-	c.JSON(200, gin.H{"status": "ok"})
+	router.Run(":" + port)
 }
 
 func statusHandler(c *gin.Context) {
-	stateMu.Lock()
-	copyState := *state
-	stateMu.Unlock()
-	c.JSON(200, copyState)
+	stateMu.RLock()
+	s := *state
+	stateMu.RUnlock()
+	c.JSON(200, s)
+}
+
+func historyHandler(c *gin.Context) {
+	data, err := getHistory()
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"success": true, "data": data})
+}
+
+func clearHistoryHandler(c *gin.Context) {
+	if err := clearHistory(); err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"success": true})
 }
 
 func triggerHandler(c *gin.Context) {
-	bodyBytes, err := c.GetRawData()
-	if err != nil {
-		c.JSON(400, gin.H{"error": "Failed to read body"})
-		return
-	}
+	raw, _ := c.GetRawData()
+	trig := strings.TrimSpace(string(raw))
 
-	trigger := strings.TrimSpace(string(bodyBytes))
-	// Accept JSON {"trigger":"start"} as well
-	if strings.HasPrefix(trigger, "{") {
-		var payload map[string]string
-		if err := json.Unmarshal(bodyBytes, &payload); err == nil {
-			if t, ok := payload["trigger"]; ok {
-				trigger = t
-			}
+	if strings.HasPrefix(trig, "{") {
+		var p map[string]string
+		_ = json.Unmarshal(raw, &p)
+		if v, ok := p["trigger"]; ok {
+			trig = v
 		}
 	}
 
-	log.Printf("📥 HTTP trigger received: %s", trigger)
-	handleTrigger(trigger)
-
-	c.JSON(200, gin.H{
-		"success":   true,
-		"message":   "Trigger received",
-		"trigger":   trigger,
-		"timestamp": time.Now().Format(time.RFC3339Nano),
-	})
+	handleTrigger(trig)
+	c.JSON(200, gin.H{"success": true, "trigger": trig})
 }
 
 func wsHandler(c *gin.Context) {
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
-		log.Println("❌ WebSocket upgrade error:", err)
+		log.Println("WS upgrade failed:", err)
 		return
 	}
 
@@ -134,59 +215,36 @@ func wsHandler(c *gin.Context) {
 		closed: make(chan struct{}),
 	}
 
-	// register client
 	wsMutex.Lock()
 	wsClients[client] = true
 	wsMutex.Unlock()
 
-	log.Println("📡 WebSocket client connected. Total clients:", clientCount())
-
-	// start pumps
 	go client.writePump()
 	go client.readPump()
-
-	// send immediate snapshot
 	client.sendSnapshot()
 }
 
-// clientCount returns number of connected clients (with mutex)
-func clientCount() int {
-	wsMutex.Lock()
-	n := len(wsClients)
-	wsMutex.Unlock()
-	return n
-}
-
-// readPump reads messages from the websocket connection and handles triggers.
-// It sets read limits and pong handler for keepalive.
 func (c *Client) readPump() {
 	defer c.close()
 
 	c.conn.SetReadLimit(maxMessageSize)
-	_ = c.conn.SetReadDeadline(time.Now().Add(pongWait))
+	c.conn.SetReadDeadline(time.Now().Add(pongWait))
 	c.conn.SetPongHandler(func(string) error {
-		_ = c.conn.SetReadDeadline(time.Now().Add(pongWait))
+		c.conn.SetReadDeadline(time.Now().Add(pongWait))
 		return nil
 	})
 
 	for {
 		var msg map[string]string
 		if err := c.conn.ReadJSON(&msg); err != nil {
-			// when client disconnects or sends invalid JSON, exit
-			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Println("❌ WebSocket read error:", err)
-			}
 			break
 		}
-		// handle trigger if present
-		if trigger, ok := msg["trigger"]; ok {
-			log.Printf("📥 WS trigger received: %s", trigger)
-			handleTrigger(trigger)
+		if t, ok := msg["trigger"]; ok {
+			handleTrigger(t)
 		}
 	}
 }
 
-// writePump writes messages from send channel to websocket connection and sends periodic pings.
 func (c *Client) writePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
@@ -196,160 +254,153 @@ func (c *Client) writePump() {
 
 	for {
 		select {
-		case message, ok := <-c.send:
-			_ = c.conn.SetWriteDeadline(time.Now().Add(writeWait))
+		case m, ok := <-c.send:
+			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
-				// send channel closed
-				_ = c.conn.WriteMessage(websocket.CloseMessage, []byte{})
+				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
-			if err := c.conn.WriteMessage(websocket.TextMessage, message); err != nil {
+			if err := c.conn.WriteMessage(websocket.TextMessage, m); err != nil {
 				return
 			}
 
 		case <-ticker.C:
-			_ = c.conn.SetWriteDeadline(time.Now().Add(writeWait))
+			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
 				return
 			}
+
 		case <-c.closed:
 			return
 		}
 	}
 }
 
-// sendSnapshot sends current state immediately to this client (non-blocking)
 func (c *Client) sendSnapshot() {
-	stateMu.Lock()
-	data, err := json.Marshal(state)
-	stateMu.Unlock()
+	stateMu.RLock()
+	b, err := json.Marshal(state)
+	stateMu.RUnlock()
 	if err != nil {
 		return
 	}
 	select {
-	case c.send <- data:
+	case c.send <- b:
 	default:
-		// if channel full, drop
 	}
 }
 
-// close removes client from registry and closes underlying resources once.
 func (c *Client) close() {
 	c.closeOnce.Do(func() {
-		// unregister
 		wsMutex.Lock()
-		if _, ok := wsClients[c]; ok {
-			delete(wsClients, c)
-		}
+		delete(wsClients, c)
 		wsMutex.Unlock()
 
-		// close send channel to signal writer to finish
 		close(c.send)
-
-		// close websocket connection
-		_ = c.conn.Close()
-
-		// signal closed
+		c.conn.Close()
 		close(c.closed)
-
-		log.Println("📡 WebSocket client disconnected. Total clients:", clientCount())
 	})
 }
 
-func handleTrigger(trigger string) {
-	trigger = strings.ToLower(strings.TrimSpace(trigger))
+func handleTrigger(t string) {
+	t = strings.ToLower(strings.TrimSpace(t))
 	now := time.Now().UnixMilli()
-	log.Println("Received trigger:", trigger)
+
+	var toSave int64 = 0
 
 	stateMu.Lock()
-	switch trigger {
+	switch t {
 	case "start":
 		if !state.Running {
 			state.Running = true
 			state.StartTime = now
-			state.Status = "Running"
-			state.FinishTime = 0
 			state.ElapsedMs = 0
-			log.Println("⏱️  Timer started")
+			state.Status = "Running"
+			// Stopwatch starts with Timer Lapse
+			if !state.StopwatchRunning {
+				state.StopwatchRunning = true
+				state.StopwatchElapsed = 0
+				state.StartTimeStopWatch = now
+			}
+
 		}
+
 	case "finish":
 		if state.Running {
 			state.Running = false
 			state.FinishTime = now
-			state.ElapsedMs = state.FinishTime - state.StartTime
+			state.ElapsedMs = now - state.StartTime
 			state.Status = "Finished"
-			log.Println("⏹️  Timer finished. Elapsed:", state.ElapsedMs, "ms")
+			toSave = state.ElapsedMs
 		}
+		// Stopwatch continues running even after Timer Lapse finishes
+
 	case "reset":
 		state.Running = false
+		state.Status = "Idle"
 		state.ElapsedMs = 0
 		state.StartTime = 0
 		state.FinishTime = 0
-		state.Status = "Idle"
-		log.Println("🔄 Timer reset")
-	default:
-		log.Println("⚠️  Unknown trigger:", trigger)
+		// Reset stopwatch only when explicitly requested
+		state.StopwatchRunning = false
+		state.StopwatchElapsed = state.StopwatchMaxMs
+		state.StartTimeStopWatch = 0
 	}
 	stateMu.Unlock()
 
-	// broadcast immediately after state change (unlock first to avoid deadlock)
+	if toSave > 0 {
+		go saveToHistory(toSave)
+	}
+
 	broadcastStatus()
 }
 
 func timerTicker() {
-	log.Println("⏱️  Timer ticker started")
-	ticker := time.NewTicker(10 * time.Millisecond) // 20 Hz updates
+	ticker := time.NewTicker(20 * time.Millisecond)
 	defer ticker.Stop()
 
-	tickCount := 0
 	for range ticker.C {
-		tickCount++
 
 		stateMu.Lock()
 		if state.Running {
-			now := time.Now().UnixMilli()
-			state.ElapsedMs = now - state.StartTime
+			state.ElapsedMs = time.Now().UnixMilli() - state.StartTime
 		}
-		isRunning := state.Running
-		elapsed := state.ElapsedMs
+
+		// Handle stopwatch countdown
+		if state.StopwatchRunning {
+			state.StopwatchElapsed = time.Now().UnixMilli() - state.StartTimeStopWatch
+
+			// Stop stopwatch when 10 minutes have passed
+			if state.StopwatchElapsed >= state.StopwatchMaxMs {
+				state.StopwatchRunning = false
+				state.StopwatchElapsed = state.StopwatchMaxMs
+			}
+		}
+
+		running := state.Running
+		stopwatchRunning := state.StopwatchRunning
 		stateMu.Unlock()
-		if isRunning {
-			// broadcast regularly
+
+		if running || stopwatchRunning {
 			broadcastStatus()
-		}
-		// periodic log every ~1 second
-		if tickCount%20 == 0 {
-			log.Printf("⏱️  Tick #%d - Elapsed: %dms, Running: %v, Clients: %d\n", tickCount, elapsed, isRunning, clientCount())
 		}
 	}
 }
 
-// broadcastStatus marshals the state and pushes to all clients' send channel (non-blocking).
 func broadcastStatus() {
-	stateMu.Lock()
-	data, err := json.Marshal(state)
-	stateSnapshot := *state
-	stateMu.Unlock()
-
+	stateMu.RLock()
+	b, err := json.Marshal(state)
+	stateMu.RUnlock()
 	if err != nil {
-		log.Println("❌ Error marshaling state:", err)
 		return
 	}
 
 	wsMutex.Lock()
-	clientCount := len(wsClients)
-	defer wsMutex.Unlock()
-
-	log.Printf("📤 Broadcasting to %d clients - Running: %v, Elapsed: %dms\n", clientCount, stateSnapshot.Running, stateSnapshot.ElapsedMs)
-
-	for client := range wsClients {
+	for c := range wsClients {
 		select {
-		case client.send <- data:
-			// queued
+		case c.send <- b:
 		default:
-			// client send channel full -> disconnect it to recover
-			log.Println("⚠️ Client send buffer full — disconnecting client to recover")
-			go client.close()
+			go c.close()
 		}
 	}
+	wsMutex.Unlock()
 }

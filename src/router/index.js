@@ -2,7 +2,6 @@ import { createWebHistory, createRouter } from "vue-router";
 import Stopwatch from "@/views/Stopwatch.vue";
 import Juri from "@/views/Juri.vue";
 
-
 const routes = [
   {
     path: "/",
