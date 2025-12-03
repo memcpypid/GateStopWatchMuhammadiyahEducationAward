@@ -23,63 +23,25 @@
           <!-- Right Logo -->
           <div class="flex items-center gap-4 flex-shrink-0">
             <div class="hidden sm:block w-1 h-12 bg-gradient-to-b from-red-600 to-red-400"></div>
-            <img src="../assets/maskot.png" alt="mealogo" class="h-14 sm:h-16 w-auto object-contain">
+            <img src="../assets/maskot.png" alt="maskotlogo" class="h-20 sm:h-50 w-auto object-contain bg-white">
           </div>
         </div>
       </div>
     </header>
 
     <!-- Main Content -->
-    <main class="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 pt-28 sm:pt-32 pb-12">
-      <!-- Title Section -->
-      <div class="mb-8 sm:mb-12 text-center w-full max-w-6xl">
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 leading-tight">
-          Kontes Kapal Indonesia
-        </h2>
-        <div
-          class="h-1.5 w-20 sm:w-24 bg-gradient-to-r from-red-600 via-red-500 to-red-400 mx-auto rounded-full shadow-md">
-        </div>
-      </div>
-
+    <main class="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 pt-10 sm:pt-10 pb-12">
       <!-- Container for Timer and History -->
-      <div class="w-full max-w-6xl flex gap-4 sm:gap-6 lg:gap-8">
-        <!-- History Sidebar -->
-        <div class="hidden lg:flex flex-col w-64 flex-shrink-0">
-          <div
-            class="bg-white rounded-2xl shadow-xl border-t-4 border-red-600 overflow-hidden h-full flex flex-col max-h-96">
-            <!-- History Header -->
-            <div class="bg-gradient-to-r from-red-50 to-pink-50 px-6 py-4 border-b border-red-200 flex-shrink-0">
-              <div class="flex items-center justify-between">
-                <h3 class="text-lg font-bold text-red-700">📋 History</h3>
-                <button @click="clearHistory" v-if="history.length > 0"
-                  class="text-xs px-2 py-1 bg-red-200 hover:bg-red-300 text-red-700 rounded font-semibold transition-colors">
-                  Clear
-                </button>
-              </div>
-            </div>
+      <div class="w-full max-w-10xl flex gap-4 sm:gap-6 lg:gap-8">
 
-            <!-- History List -->
-            <div class="flex-1 overflow-y-auto p-4 space-y-2">
-              <div v-if="history.length === 0" class="text-center py-8 text-gray-400">
-                <p class="text-sm">No history yet</p>
-              </div>
-              <div v-for="(entry, index) in history" :key="entry.id"
-                class="bg-gradient-to-r from-slate-50 to-slate-100 p-3 rounded-lg border border-slate-200 hover:border-red-300 transition-colors">
-                <p class="text-xs font-semibold text-red-600 mb-1">Time Lapse {{ index + 1 }}</p>
-                <p class="text-lg font-mono font-bold text-gray-800">{{ formatHistoryTime(entry.elapsed_ms) }}</p>
-                <p class="text-xs text-gray-500 mt-1">{{ formatTimestamp(entry.timestamp) }}</p>
-              </div>
-            </div>
-          </div>
-        </div>
 
         <!-- Timer Card Container -->
-        <div class="w-full lg:max-w-3xl">
+        <div class="w-full">
           <div
             class="bg-white rounded-3xl shadow-2xl border-t-4 border-red-600 overflow-hidden hover:shadow-3xl transition-shadow duration-300">
             <!-- Card Header -->
             <div class="bg-gradient-to-r from-red-50 to-pink-50 px-6 sm:px-8 py-6 border-b border-red-200">
-              <h3 class="text-2xl sm:text-3xl font-bold text-red-700 text-center">⏱️ Timer Kompetisi</h3>
+              <h3 class="text-2xl sm:text-3xl font-bold text-red-700 text-center">Timer Lapse</h3>
             </div>
 
             <!-- Timer Display Section -->
@@ -93,72 +55,100 @@
                     {{ data.time }}
                   </div>
                   <div
-                    class="flex justify-center gap-6 sm:gap-12 mt-6 text-xs sm:text-sm font-bold text-slate-600 uppercase tracking-widest">
-                    <span class="px-3 py-1 bg-slate-200 rounded-full">Menit (MM)</span>
-                    <span class="px-3 py-1 bg-slate-200 rounded-full">Detik (SS)</span>
-                    <span class="px-3 py-1 bg-slate-200 rounded-full">Milidetik (ms)</span>
+                    class="flex justify-center gap-40  mt-6 text-1xl  font-bold text-slate-600 uppercase tracking-widest">
+                    <span class="px-3 py-1 bg-slate-200 rounded-full">Menit</span>
+                    <span class="px-3 py-1 bg-slate-200 rounded-full">Detik</span>
+                    <span class="px-3 py-1 bg-slate-200 rounded-full">MiliDetik</span>
                   </div>
                 </div>
+              </div>
+            </div>
+
+
+          </div>
+
+        </div>
+        <!-- History Sidebar -->
+        <div class="hidden lg:flex flex-col w-64 flex-shrink-0 overflow-y-auto max-h-[600px]">
+          <div class="bg-white rounded-2xl shadow-xl border-t-4 border-red-600 overflow-hidden h-full flex flex-col">
+            <!-- History Header -->
+            <div class="bg-gradient-to-r from-red-50 to-pink-50 px-6 py-4 border-b border-red-200 flex-shrink-0">
+              <div class="flex items-center justify-between">
+                <h3 class="text-lg font-bold text-red-700">History</h3>
+                <button @click="clearHistory" v-if="history.length > 0"
+                  class="text-xs px-2 py-1 bg-red-200 hover:bg-red-300 text-red-700 rounded font-semibold transition-colors">
+                  Clear
+                </button>
+              </div>
+            </div>
+
+            <!-- History List -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-2">
+              <div v-if="history.length === 0" class="text-center py-8 text-gray-400">
+                <p class="text-sm">History </p>
+              </div>
+              <div v-for="(entry, index) in history" :key="entry.id"
+                class="bg-gradient-to-r from-slate-50 to-slate-100 p-3 rounded-lg border border-slate-200 hover:border-red-300 transition-colors">
+                <p class="text-lg font-semibold text-red-600 mb-1">Time Lapse {{ index + 1 }}</p>
+                <p class="text-2xl font-mono font-bold text-gray-800">{{ formatHistoryTime(entry.elapsed_ms) }}</p>
+                <p class="text-sm text-gray-500 mt-1">{{ formatTimestamp(entry.timestamp) }}</p>
               </div>
             </div>
           </div>
         </div>
       </div>
+
     </main>
+
+    <!-- Reset Confirmation Modal -->
+    <transition enter-active-class="transition ease-out duration-200" enter-from-class="opacity-0 scale-95"
+      enter-to-class="opacity-100 scale-100" leave-active-class="transition ease-in duration-200"
+      leave-from-class="opacity-100 scale-100" leave-to-class="opacity-0 scale-95">
+      <div v-if="showResetModal"
+        class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 max-w-sm w-full border-t-4 border-red-600">
+          <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">🔄 Konfirmasi Reset</h2>
+          <p class="text-gray-600 mb-8 text-sm sm:text-base leading-relaxed">
+            Apakah Anda yakin ingin mereset timer? Tindakan ini tidak dapat dibatalkan.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-3 justify-end">
+            <button @click="showResetModal = false"
+              class="px-6 py-2 sm:py-3 bg-gradient-to-br from-gray-300 to-gray-400 hover:from-gray-400 hover:to-gray-500 text-gray-800 font-bold rounded-lg transition-all duration-200 hover:shadow-md active:scale-95">
+              Batal
+            </button>
+            <button @click="confirmReset"
+              class="px-6 py-2 sm:py-3 bg-gradient-to-br from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 text-white font-bold rounded-lg transition-all duration-200 hover:shadow-md active:scale-95">
+              Reset Sekarang
+            </button>
+          </div>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
 <script>
-const WS_URL = process.env.VUE_APP_WS_URL || 'ws://localhost:3000';
+const WS_URL = process.env.VUE_APP_WS_URL || 'ws://192.168.1.175:3000';
 
 export default {
-  name: "JuriPage",
+  name: "HomePage",
   data() {
     return {
+      showResetModal: false,
       data: {
         time: '00:00:00'
       },
       history: [],
       ws: null,
       wsConnected: false,
+      lastStatus: "Idle",
     };
   },
 
   methods: {
-    zeroPrefix(num, digit) {
-      return String(num).padStart(digit, '0');
-    },
-
-    formatTime(elapsedMs) {
-      const minutes = Math.floor(elapsedMs / 60000);
-      const seconds = Math.floor((elapsedMs % 60000) / 1000);
-      const milliseconds = elapsedMs % 1000;
-
-      return (
-        this.zeroPrefix(minutes, 2) + ":" +
-        this.zeroPrefix(seconds, 2) + ":" +
-        this.zeroPrefix(milliseconds, 2)
-      );
-    },
-
-    formatHistoryTime(elapsedMs) {
-      const minutes = Math.floor(elapsedMs / 60000);
-      const seconds = Math.floor((elapsedMs % 60000) / 1000);
-      const milliseconds = Math.floor(elapsedMs % 1000 / 10);
-
-      return (
-        this.zeroPrefix(minutes, 2) + ":" +
-        this.zeroPrefix(seconds, 2) + ":" +
-        this.zeroPrefix(milliseconds, 2)
-      );
-    },
-
-    formatTimestamp(timestamp) {
-      const date = new Date(timestamp);
-      const hours = this.zeroPrefix(date.getHours(), 2);
-      const minutes = this.zeroPrefix(date.getMinutes(), 2);
-      const seconds = this.zeroPrefix(date.getSeconds(), 2);
-      return `${hours}:${minutes}:${seconds}`;
+    confirmReset() {
+      this.showResetModal = false;
+      this.sendTrigger("reset");
     },
 
     async loadHistory() {
@@ -191,13 +181,58 @@ export default {
       }
     },
 
+    sendTrigger(triggerType) {
+      if (!this.wsConnected) {
+        console.warn("❌ WebSocket not connected!");
+        return;
+      }
+      const message = JSON.stringify({ trigger: triggerType });
+      this.ws.send(message);
+      console.log("📡 Trigger sent:", triggerType);
+    },
+
+    zeroPrefix(num, digit) {
+      return String(num).padStart(digit, '0');
+    },
+
+    formatTime(elapsedMs) {
+      const minutes = Math.floor(elapsedMs / 60000);
+      const seconds = Math.floor((elapsedMs % 60000) / 1000);
+      const milliseconds = Math.floor(elapsedMs % 1000);
+      return (
+        this.zeroPrefix(minutes, 2) + ":" +
+        this.zeroPrefix(seconds, 2) + ":" +
+        this.zeroPrefix(milliseconds, 3)
+      );
+    },
+
+    formatHistoryTime(elapsedMs) {
+      const minutes = Math.floor(elapsedMs / 60000);
+      const seconds = Math.floor((elapsedMs % 60000) / 1000);
+      const milliseconds = Math.floor(elapsedMs % 1000);
+
+      return (
+        this.zeroPrefix(minutes, 2) + ":" +
+        this.zeroPrefix(seconds, 2) + ":" +
+        this.zeroPrefix(milliseconds, 3)
+      );
+    },
+
+    formatTimestamp(timestamp) {
+      const date = new Date(timestamp);
+      const hours = this.zeroPrefix(date.getHours(), 2);
+      const minutes = this.zeroPrefix(date.getMinutes(), 2);
+      const seconds = this.zeroPrefix(date.getSeconds(), 2);
+      return `${hours}:${minutes}:${seconds}`;
+    },
+
     setupWebSocket() {
       try {
         this.ws = new WebSocket(`${WS_URL}/ws`);
 
         this.ws.onopen = () => {
           this.wsConnected = true;
-          console.log("🟢 WebSocket Connected (Juri)");
+          console.log("🟢 WebSocket Connected");
           this.loadHistory();
         };
 
@@ -205,8 +240,9 @@ export default {
           try {
             const timerState = JSON.parse(event.data);
             console.log("📨 Received from backend:", timerState);
-            if (timerState.status === 'Finished' && !timerState.running) {
-              this.loadHistory()
+            if (timerState.status !== this.lastStatus) {
+              this.loadHistory();
+              this.lastStatus = timerState.status;
             }
             this.data.time = this.formatTime(timerState.elapsed_ms);
           } catch (error) {
@@ -231,7 +267,7 @@ export default {
   },
 
   mounted() {
-    console.log("🚀 Juri Page Loaded");
+    console.log("🚀 Home Page Loaded");
     console.log("📡 WebSocket URL:", WS_URL);
     this.setupWebSocket();
     this.loadHistory();

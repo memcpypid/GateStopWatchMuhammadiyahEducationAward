@@ -44,7 +44,7 @@ type Client struct {
 var (
 	state = &TimerState{
 		Status:         "Idle",
-		StopwatchMaxMs: 1 * 60 * 1000,
+		StopwatchMaxMs: 10 * 60 * 1000,
 	}
 	stateMu sync.RWMutex
 
@@ -342,7 +342,7 @@ func handleTrigger(t string) {
 		state.FinishTime = 0
 		// Reset stopwatch only when explicitly requested
 		state.StopwatchRunning = false
-		state.StopwatchElapsed = state.StopwatchMaxMs
+		state.StopwatchElapsed = 0
 		state.StartTimeStopWatch = 0
 	}
 	stateMu.Unlock()
@@ -372,7 +372,7 @@ func timerTicker() {
 			// Stop stopwatch when 10 minutes have passed
 			if state.StopwatchElapsed >= state.StopwatchMaxMs {
 				state.StopwatchRunning = false
-				state.StopwatchElapsed = state.StopwatchMaxMs
+				state.StopwatchElapsed = 0
 			}
 		}
 
